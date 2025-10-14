@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - '**' # Test
+  pull_request:
+    branches:
+      - main
+
+jobs:
+
+  build-wxwidgets:
+    runs-on: windows-latest
+
+    env:
+      WX_VERSION: 3.2.8
+      WXWIN: C:\wxWidgets
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Restore wxWidgets cache
+        uses: actions/cache@v4
+        id: wx-cache
+        with:
+          path: C:\wxWidgets
+          key: wxwidgets-${{ env.WX_VERSION }}-release-x64
+
+      - name: Download wxWidgets
+        if: steps.wx-cache.outputs.cache-hit != 'true'
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/wxWidgets/wxWidgets/releases/download/v${{ env.WX_VERSION }}/wxWidgets-${{ env.WX_VERSION }}.zip" -OutFile "$env:TEMP\wx.zip"
+          Expand-Archive -Path "$env:TEMP\wx.zip" -DestinationPath "C:\wxWidgets"
+
+      - name: Build wxWidgets (Release x64)
+        if: steps.wx-cache.outputs.cache-hit != 'true'
+        run: |
+          echo "Building wxWidgets..."
+          msbuild "C:\wxWidgets\build\msw\wx_vc17.sln" /p:Configuration=Release /p:Platform=x64 /m
