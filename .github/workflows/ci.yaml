@@ -34,6 +34,16 @@ jobs:
           Invoke-WebRequest -Uri "https://github.com/wxWidgets/wxWidgets/releases/download/v${{ env.WX_VERSION }}/wxWidgets-${{ env.WX_VERSION }}.zip" -OutFile "$env:TEMP\wx.zip"
           Expand-Archive -Path "$env:TEMP\wx.zip" -DestinationPath "C:\wxWidgets"
 
+        # https://github.com/actions/runner-images/blob/main/images/windows/Windows2025-Readme.md
+        # Visual Studio Enterprise
+        # Version 2022 17.14.36518.9
+        # C:\Program Files\Microsoft Visual Studio\2022\Enterprise
+      - name: Setup MSVC Developer Command Prompt
+        if: steps.wx-cache.outputs.cache-hit != 'true'
+        uses: microsoft/setup-msbuild@v2
+        with:
+          vs-version: '[17.1,18.0)'
+
       - name: Build wxWidgets (Release x64)
         if: steps.wx-cache.outputs.cache-hit != 'true'
         run: |
