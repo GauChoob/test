@@ -3,14 +3,29 @@ name: CI
 on:
   push:
     branches:
-      - '**' # Test
+      - "main"
+    paths-ignore:
+      - readme.md
   pull_request:
-    branches:
-      - main
+    paths-ignore:
+      - readme.md
+  workflow_dispatch:
 
 jobs:
+  formatting-check:
+    runs-on: ubuntu-latest
+    steps:
+      # Visual Studio 2022 version 17.14.2 uses clang-format.exe version 19.1.5 
+      - name: Install clang-format
+        run: |
+          run: sudo apt install -y clang-format-18
+
+      - name: Run clang-format
+        run: |
+          find . \( -name '*.h' -o -name '*.cpp' \) ! -name 'directinput_scancodes.h' ! -name 'sha3.*' ! -name 'cpp.*' ! -name 'json.*' | xargs clang-format -Werror --dry-run
 
   build-wxwidgets:
+    needs: formatting-check
     runs-on: windows-latest
 
     env:
@@ -18,12 +33,17 @@ jobs:
       WXWIN: C:\wxWidgets
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Restore wxWidgets cache
+      - name: Check wxWidgets cache
         uses: actions/cache@v4
         id: wx-cache
+        with:
+          path: C:\wxWidgets
+          key: wxwidgets-${{ env.WX_VERSION }}-release-x64
+          lookup-only: true
+
+      - name: Setup wxWidgets cache
+        if: steps.wx-cache.outputs.cache-hit != 'true'
+        uses: actions/cache@v4
         with:
           path: C:\wxWidgets
           key: wxwidgets-${{ env.WX_VERSION }}-release-x64
@@ -38,7 +58,7 @@ jobs:
         # Visual Studio Enterprise
         # Version 2022 17.14.36518.9
         # C:\Program Files\Microsoft Visual Studio\2022\Enterprise
-      - name: Setup MSVC Developer Command Prompt
+      - name: Visual Studio 17
         if: steps.wx-cache.outputs.cache-hit != 'true'
         uses: microsoft/setup-msbuild@v2
         with:
@@ -47,5 +67,4 @@ jobs:
       - name: Build wxWidgets (Release x64)
         if: steps.wx-cache.outputs.cache-hit != 'true'
         run: |
-          echo "Building wxWidgets..."
           msbuild "C:\wxWidgets\build\msw\wx_vc17.sln" /p:Configuration=Release /p:Platform=x64 /m

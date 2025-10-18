@@ -1,0 +1,3 @@
+bad format
+
+    void(                )        {}
