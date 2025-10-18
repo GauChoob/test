@@ -21,15 +21,11 @@ jobs:
       # Visual Studio 2022 version 17.14.2 uses clang-format.exe version 19.1.5 
       - name: Install clang-format
         run: |
-          sudo apt-get install -y clang-format-18
+          sudo apt-get install -y clang-format-19
 
       - name: Run clang-format
         run: |
-          set -x
           find . \( -name '*.h' -o -name '*.cpp' \) ! -name 'directinput_scancodes.h' ! -name 'sha3.*' ! -name 'cpp.*' ! -name 'json.*' | tee /dev/stderr | xargs clang-format -Werror --dry-run
-          find . \( -name '*.h' -o -name '*.cpp' \) ! -name 'directinput_scancodes.h' ! -name 'sha3.*' ! -name 'cpp.*' ! -name 'json.*'
-          find . \( -name '*.h' -o -name '*.cpp' \)
-          ls
 
   build-wxwidgets:
     needs: formatting-check
