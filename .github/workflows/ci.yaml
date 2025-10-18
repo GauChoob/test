@@ -18,19 +18,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Cache APT packages
+      - name: Cache clang-format-19
         uses: actions/cache@v3
         with:
-          path: /var/cache/apt/archives
-          key: ${{ runner.os }}-apt-${{ hashFiles('**/apt-packages.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-apt-
+          path: |
+            /usr/bin/clang-format-19
+            /usr/lib/llvm-19
+            /usr/share/clang
+          key: clang-format-19-${{ runner.os }}-v1
 
       # Visual Studio 2022 version 17.14.2 uses clang-format.exe version 19.1.5 
       - name: Install clang-format
+        if: clang-format-19-${{ runner.os }}-v1 != 'true'
         run: |
           sudo apt-get install -y clang-format-19
-          dpkg -L clang-format-19
 
       - name: Run clang-format
         run: |
