@@ -18,15 +18,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Cache clang-format-19
-        uses: actions/cache@v3
-        with:
-          path: |
-            /usr/bin/clang-format-19
-            /usr/lib/llvm-19
-            /usr/share/clang
-          key: clang-format-19-${{ runner.os }}-v1
-
       # Visual Studio 2022 version 17.14.2 uses clang-format.exe version 19.1.5 
       - name: Install clang-format
         if: clang-format-19-${{ runner.os }}-v1 != 'true'
@@ -35,7 +26,7 @@ jobs:
 
       - name: Run clang-format
         run: |
-          find . \( -name '*.h' -o -name '*.cpp' \) ! -name 'directinput_scancodes.h' ! -name 'sha3.*' ! -name 'cpp.*' ! -name 'json.*' | tee /dev/stderr | xargs clang-format -Werror --dry-run
+          find . \( -name '*.h' -o -name '*.cpp' \) ! -name 'directinput_scancodes.h' ! -name 'sha3.*' ! -name 'md.*' ! -name 'json.*' | tee /dev/stderr | xargs clang-format -Werror --dry-run
 
   build-wxwidgets:
     needs: formatting-check
