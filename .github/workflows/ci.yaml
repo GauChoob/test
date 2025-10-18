@@ -22,7 +22,11 @@ jobs:
 
       - name: Run clang-format
         run: |
-          find . \( -name '*.h' -o -name '*.cpp' \) ! -name 'directinput_scancodes.h' ! -name 'sha3.*' ! -name 'cpp.*' ! -name 'json.*' | xargs clang-format -Werror --dry-run
+          set -x
+          find . \( -name '*.h' -o -name '*.cpp' \) ! -name 'directinput_scancodes.h' ! -name 'sha3.*' ! -name 'cpp.*' ! -name 'json.*' | tee /dev/stderr | xargs clang-format -Werror --dry-run
+          find . \( -name '*.h' -o -name '*.cpp' \) ! -name 'directinput_scancodes.h' ! -name 'sha3.*' ! -name 'cpp.*' ! -name 'json.*'
+          find . \( -name '*.h' -o -name '*.cpp' \)
+          ls
 
   build-wxwidgets:
     needs: formatting-check
