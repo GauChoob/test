@@ -30,6 +30,7 @@ jobs:
       - name: Install clang-format
         run: |
           sudo apt-get install -y clang-format-19
+          dpkg -L clang-format-19
 
       - name: Run clang-format
         run: |
