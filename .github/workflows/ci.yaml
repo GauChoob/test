@@ -6,9 +6,13 @@ on:
       - "main"
     paths-ignore:
       - readme.md
+      - "icons/**"
+      - "res/**"
   pull_request:
     paths-ignore:
       - readme.md
+      - "icons/**"
+      - "res/**"
   workflow_dispatch:
 
 jobs:
@@ -26,6 +30,8 @@ jobs:
 
       - name: Run clang-format
         run: |
+          clang-format --version
+          clang-format-19 --version
           find . \( -name '*.h' -o -name '*.cpp' \) ! -name 'directinput_scancodes.h' ! -name 'sha3.*' ! -name 'md.*' ! -name 'json.*' | tee /dev/stderr | xargs clang-format -Werror --dry-run
 
   build-wxwidgets:
